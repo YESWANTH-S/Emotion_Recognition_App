@@ -4,3 +4,4 @@ venv/
 *.log
 models/
 *.h5
+data/
