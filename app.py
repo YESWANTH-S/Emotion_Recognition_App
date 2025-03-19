@@ -122,6 +122,11 @@ def use_webcam_page():
 def livefeed_page():
     return render_template('livefeed.html')
 
+# Add custom 404 handler
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
+
 @app.route('/upload', methods=['POST'])
 def upload_image():
     if 'file' not in request.files:
