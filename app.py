@@ -134,16 +134,23 @@ def upload_image():
     
     file = request.files['file']
     filename = secure_filename(file.filename)
-    
+
+    if not allowed_file(filename):
+        return jsonify({'error': 'Unsupported file type'}), 400
+
     temp_file_path = os.path.join('uploads', filename)
     file.save(temp_file_path)
 
     # Detect emotions
-    emotions = detect_emotion_from_image(cv2.imread(temp_file_path))
+    image = cv2.imread(temp_file_path)
+    if image is None:
+        os.remove(temp_file_path)
+        return jsonify({'error': 'Invalid image file'}), 400
 
+    emotions = detect_emotion_from_image(image)
     os.remove(temp_file_path)
 
-    return jsonify(emotions)
+    return jsonify(emotions)  # will return [] if no face detected (frontend handles it)
 
 @app.route('/upload_video', methods=['POST'])
 def upload_video():
@@ -153,20 +160,19 @@ def upload_video():
     file = request.files['file']
     filename = secure_filename(file.filename)
 
+    if not allowed_file(filename):
+        return jsonify({'error': 'Unsupported file type'}), 400
+
     temp_file_path = os.path.join('uploads', filename)
     file.save(temp_file_path)
 
     frame_emotions = detect_emotion_from_video(temp_file_path)
     os.remove(temp_file_path)
 
-    # Create a summary of emotions detected
     summary = {}
     for frame in frame_emotions:
         for emotion in frame:
-            if emotion['emotion'] in summary:
-                summary[emotion['emotion']] += 1
-            else:
-                summary[emotion['emotion']] = 1
+            summary[emotion['emotion']] = summary.get(emotion['emotion'], 0) + 1
 
     summary_output = [{'emotion': key, 'count': value} for key, value in summary.items()]
 
