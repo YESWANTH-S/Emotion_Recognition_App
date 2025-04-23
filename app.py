@@ -184,16 +184,24 @@ def upload_video():
 @app.route('/detect_frame', methods=['POST'])
 def detect_frame():
     data = request.get_json()
-    img_data = data.get('image')
+    if not data or 'image' not in data:
+        return jsonify({'error': 'No image data received'}), 400
 
-    img_data = img_data.split(',')[1]
-    img_data = base64.b64decode(img_data)
-    np_img = np.frombuffer(img_data, np.uint8)
-    img = cv2.imdecode(np_img, cv2.IMREAD_COLOR)
+    try:
+        img_data = data['image'].split(',')[1]
+        img_bytes = base64.b64decode(img_data)
+        np_img = np.frombuffer(img_bytes, np.uint8)
+        img = cv2.imdecode(np_img, cv2.IMREAD_COLOR)
 
-    emotions = detect_emotion_from_image(img)
+        if img is None:
+            return jsonify({'error': 'Invalid image data'}), 400
 
-    return jsonify(emotions)
+        emotions = detect_emotion_from_image(img)
+        return jsonify(emotions)  # returns [] if no faces detected
+
+    except Exception as e:
+        return jsonify({'error': 'Failed to process image', 'details': str(e)}), 500
+
 
 if __name__ == '__main__':
     app.run(debug=True)
