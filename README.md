@@ -1,8 +1,8 @@
 
-# Emotion Detection App
+# Emotion Recognition App
 
 ## 🚀 Overview
-The Emotion Detection App is a web-based application that uses deep learning to recognize human emotions from facial expressions. Built with **Flask**, **OpenCV**, and **TensorFlow**, the app supports multiple input methods including image upload, video upload, and real-time webcam feed.
+The Emotion Recognition App is a web-based application that uses deep learning to recognize human emotions from facial expressions. Built with **Flask**, **OpenCV**, and **TensorFlow**, the app supports multiple input methods including image upload, video upload, and real-time webcam feed.
 
 It leverages a pre-trained convolutional neural network model to classify facial emotions in various input formats.
 
